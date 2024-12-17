@@ -1,0 +1,16 @@
+# Lingkungan virtual
+/venv/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Konfigurasi rahasia
+config.py
+.env
+
+# IDE/editor
+.vscode/
+.idea/
+*.iml
+*.swp
