@@ -1,10 +1,10 @@
 # FILE: app/schemas/product_schema.py
 from ..extensions import ma
-from ..models.farm import Farm
+from ..models.business import Business
 
-class FarmSchema(ma.SQLAlchemyAutoSchema):
+class BusinessSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
-        model = Farm
+        model = Business
         load_instance = True
         include_fk = True  
     # Atur field apa yang ingin disertakan, seperti 'id' dan 'name'

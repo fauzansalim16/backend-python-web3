@@ -2,22 +2,19 @@ from app.extensions import db
 from app.seeders import (
     seed_roles, 
     seed_users, 
-    seed_farms, 
-    seed_harvests, 
-    seed_transporters, 
-    seed_transports, 
-    seed_transport_details
 )
+from app.seeders.business_seeder import seed_businesses
+from app.seeders.production_seeder import seed_productions
+from app.seeders.production_detail_seeder import seed_production_details
 
 # Mapping seeder names to functions, with the correct order
 SEEDERS = {
     "role_seeder": seed_roles,             
     "user_seeder": seed_users,             
-    "farm_seeder": seed_farms,             
-    "harvest_seeder": seed_harvests,       
-    "transporter_seeder": seed_transporters,
-    "transport_seeder": seed_transports,
-    "transport_detail_seeder": seed_transport_details
+    "business_seeder": seed_businesses,
+    "production_seeder": seed_productions,
+    "production_detail_seeder": seed_production_details,
+
 }
 
 def run_specific_seeder(seeder_name):
