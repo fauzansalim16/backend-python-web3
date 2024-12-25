@@ -3,6 +3,11 @@ import os
 import secrets
 from app.config import Config
 
+def hex_to_bytes(hex_str):
+    # Menghilangkan prefix '\x' dan mengonversi ke bytes
+    hex_str = hex_str.replace("\\x", "")
+    return bytes.fromhex(hex_str)
+
 def generate_ethereum_key_pair():
     # Generate private key
     private_key_bytes = secrets.token_bytes(32)

@@ -27,7 +27,7 @@ def send_to_blockchain(id_transaction, hash_value, private_key):
 
         # Buat transaksi
         transaction = {
-            'to': '0x0000000000000000000000000000000000000000',  # Address tujuan (contoh: alamat kosong)
+            'to': '0x2C2B9C9a4a25e24B174f26114e8926a9f2128FE4',  # Address tujuan (contoh: alamat kosong)
             'value': 0,
             'gas': 21000,
             'gasPrice': web3.to_wei('1', 'gwei'),
