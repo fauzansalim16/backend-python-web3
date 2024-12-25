@@ -1,15 +1,22 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, json
 from ..schemas.production_schemas import ProductionSchema
-from ..models import Production, db
+from ..models import Production, User, db
 from ..utils.hash_record_utils import generate_record_hash
+from ..utils.crypto_utils import decrypt_aes
 from ..extensions import joinedload
+from app.utils.blockchain_transaction_utils import store_transaction
+from app.config import Config
 
 production_bp = Blueprint('transport_bp', __name__, url_prefix='/api')
 
 @production_bp.route('/productions', methods=['GET'])
 def get_productions():
-    productions = Production.query.options(joinedload(Production.production_details)).all()
-
+    productions = Production.query.options(
+        joinedload(Production.production_details),
+        joinedload(Production.user),  # Memuat relasi users
+        joinedload(Production.business)  # Memuat relasi businesses
+    ).all()
+  
     production_schema = ProductionSchema(many=True)
 
     return jsonify(production_schema.dump(productions)), 200
@@ -66,10 +73,34 @@ def create_production():
         db.session.add(new_productions)
         db.session.commit()
         
-        # mengirim transaksi ke node
-        # create_transaksi(new_harvest.id, new_harvest.hash, new_harvest.user_id)
-        schema = ProductionSchema()
-        return jsonify(schema.dump(new_productions)), 201
+        # user = User.query.filter_by(id=new_productions.user_id).first()
+        decrypt_private_key = decrypt_aes(Config.PRIVATE_KEY)
 
+        # mengirim transaksi ke node
+        tx_receipt = store_transaction(new_productions.id, new_productions.linked_productions_id, new_productions.hash, decrypt_private_key)
+        
+        # blockchain_data = {
+        #     'transaction_hash': tx_receipt['transactionHash'].hex(),
+        #     'block_number': tx_receipt['blockNumber'],
+        #     'block_hash': tx_receipt['blockHash'].hex()
+        # }
+
+        # # Update additional_info di database
+        # new_productions.additional_info = json.dumps(blockchain_data)  # Konversi ke string JSON
+        # db.session.commit()
+
+        # Menyiapkan data response
+        response_data = {
+            'production': ProductionSchema().dump(new_productions),
+            'blockchain_receipt': {
+                'transaction_hash': tx_receipt['transactionHash'].hex(),
+                'block_number': tx_receipt['blockNumber'],
+                'block_hash': tx_receipt['blockHash'].hex(),
+                'gas_used': tx_receipt['gasUsed'],
+                'status': 'Success' if tx_receipt['status'] == 1 else 'Failed'
+            }
+        }
+
+        return jsonify(response_data), 201
     except Exception as e:
         return jsonify({"msg": "An error occurred", "error": str(e)}), 500

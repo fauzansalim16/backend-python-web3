@@ -3,15 +3,34 @@ from ..models import User, db
 from ..schemas import UserSchema
 from ..utils.crypto_utils import generate_ethereum_key_pair, encrypt_aes
 from ..utils.bcrypt_utils import hash_password
-from werkzeug.security import generate_password_hash
+from ..extensions import jwt_required, get_jwt_identity
+from werkzeug.exceptions import NotFound
 
 user_bp = Blueprint('user_bp', __name__, url_prefix='/api')
+
+@user_bp.route('/users/authorize', methods=['GET'])
+@jwt_required()
+def get_authorize_endpoint():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
+
 @user_bp.route('/users', methods=['GET'])
-def get_harvests():
+def get_users():
     # Langsung query ke database di dalam route
     users = User.query.all() 
     schema = UserSchema(many=True)
     return jsonify(schema.dump(users))
+
+@user_bp.route('/users/<int:user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+    # Cari user berdasarkan ID
+    user = User.query.get(user_id)
+    
+    if user is None:
+        return jsonify({"message": "User not found"}), 404
+    
+    schema = UserSchema()
+    return jsonify(schema.dump(user)), 200
 
 #Todo hanya user dengan role = Owner yang bisa mengakses api ini 
 @user_bp.route('/users', methods=['POST'])
@@ -44,3 +63,17 @@ def create_user():
 
     except Exception as e:
         return jsonify({"msg": "An error occurred", "error": str(e)}), 500
+
+#Todo hanya user dengan role = Owner yang bisa mengakses api ini 
+@user_bp.route('/users/<int:id>', methods=['DELETE'])
+def delete_user(id):
+    user = User.query.get(id)
+    
+    if not user:
+        raise NotFound(f"User with id {id} not found.")
+    
+    # Hapus user dari database
+    db.session.delete(user)
+    db.session.commit()
+    
+    return jsonify({"message": f"User with id {id} has been deleted."}), 200

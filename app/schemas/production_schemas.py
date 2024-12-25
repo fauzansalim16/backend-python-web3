@@ -10,6 +10,8 @@ class ProductionSchema(ma.SQLAlchemyAutoSchema):
 
     # Relasi ke TransportDetail, menyertakan data detail seperti 'id' dan lainnya
     production_details = fields.List(fields.Nested('ProductionDetailSchema'))
+    user = fields.Nested('UserSchema', only=['id', 'username']) 
+    business = fields.Nested('BusinessSchema', only=['id', 'name', 'type'])  
 
 # Schema untuk TransportDetail
 class ProductionDetailSchema(ma.SQLAlchemyAutoSchema):

@@ -6,6 +6,8 @@ from .config import Config
 from .extensions import db, ma, migrate, jwt
 from .routes import all_blueprints 
 from seed import run_specific_seeder, run_all_seeders
+from flask_cors import CORS 
+
 
 def create_app():
     app = Flask(__name__)
@@ -16,6 +18,9 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
     migrate.init_app(app, db)
+
+    # Enable CORS
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
     # Register blueprints
     for blueprint in all_blueprints:

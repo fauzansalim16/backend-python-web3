@@ -8,6 +8,6 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         model = User
         load_instance = True
         include_fk = True
-        exclude = (['password'])
+        exclude = (['password','private_key'])
 
 

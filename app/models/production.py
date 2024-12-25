@@ -29,13 +29,10 @@ class Production(db.Model):
     hash = db.Column(db.String(255), nullable=False)
     
     #Relationships
-    business = db.relationship('Business', backref=db.backref('productions', lazy=True))
-    user = db.relationship('User', backref=db.backref('productions', lazy=True))
+    user = relationship('User', backref='productions')
+    business = relationship('Business', backref='productions')
 
-    production_details = relationship(
-        'ProductionDetail', 
-        foreign_keys='[ProductionDetail.production_id]',
-        backref='productions'
+    production_details = relationship('ProductionDetail', foreign_keys='[ProductionDetail.production_id]',backref='productions'
     )
     
     # Jika perlu, tambahkan relationship lain
