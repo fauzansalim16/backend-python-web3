@@ -8,4 +8,4 @@ class BusinessSchema(ma.SQLAlchemyAutoSchema):
         load_instance = True
         include_fk = True  
     # Atur field apa yang ingin disertakan, seperti 'id' dan 'name'
-    # user = ma.Nested('UserSchema', only=['id', 'username'])  
+    user = ma.Nested('UserSchema', only=['id', 'username'])  
