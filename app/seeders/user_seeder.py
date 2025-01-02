@@ -5,7 +5,7 @@ from ..utils.crypto_utils import encrypt_aes
 
 def seed_users():
     users = [
-        {"username": "test1", "role_id": 1,"password": "password", "public_key":"gg","private_key":"c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3"}
+        {"username": "owner_test_1", "role_id": 1,"password": "password", "public_key":"0xc02251ee9b46423918b86a66e941a57e677cba44ad6c477dd171bb942cd158aab8607b2478504c5bc0554bdba80c39f55f6bdda556d0aaeeba4bcdbdba12e3d11","private_key":"c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3"}
     ]
 
     for user in users:

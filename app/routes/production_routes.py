@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request, json
 from ..schemas.production_schemas import ProductionSchema
 from ..models import Production, User, db
+from ..models.production_detail import ProductionDetail
 from ..utils.hash_record_utils import generate_record_hash
 from ..utils.crypto_utils import decrypt_aes, hex_to_bytes
 from ..utils.get_from_node import BlockchainQuery
@@ -88,7 +89,7 @@ def create_production():
         record_data = {
             "business_id": data['business_id'],
             "linked_productions_id": data['linked_productions_id'],
-            "user_id": 12, #ambil dari jwt 
+            "user_id": 100, #ambil dari jwt 
             "type": data['type'],
             "quantity": data['quantity'],
             "production_location": data['production_location'],
@@ -99,7 +100,7 @@ def create_production():
 
         new_productions = Production(
             business_id = data['business_id'],
-            user_id = 12, #ambil dari jwt
+            user_id = 100, #ambil dari jwt
             linked_productions_id = data['linked_productions_id'],
             quantity = data['quantity'],
             type = data['type'],
@@ -111,6 +112,22 @@ def create_production():
         
         db.session.add(new_productions)
         db.session.commit()
+
+        # **LOGIKA UNTUK PRODUCTION DETAIL** #
+        if data['linked_productions_id']:
+            # Handle both single ID and array of IDs
+            linked_ids = data['linked_productions_id']
+            if not isinstance(linked_ids, list):
+                linked_ids = [linked_ids]
+                
+            # Create production detail records
+            for linked_id in linked_ids:
+                if linked_id != 0:
+                    production_detail = ProductionDetail(
+                        production_id=new_productions.id,
+                        linked_productions_id=linked_id
+                    )
+                    db.session.add(production_detail)
         
         # user = User.query.filter_by(id=new_productions.user_id).first()
         # decrypt_private_key = decrypt_aes(Config.PRIVATE_KEY)
