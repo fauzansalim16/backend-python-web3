@@ -19,35 +19,11 @@ blockchain_query = BlockchainQuery(
 @production_bp.route('/productions/offchain/<hash_data>', methods=['GET'])
 def get_blockchain_transaction_by_hash(hash_data):
     try:
-        result = blockchain_query.get_transaction_by_offchain_hash(hash_data)
+        tx_hash = request.args.get('tx_hash')
+        result = blockchain_query.get_transaction_by_offchain_hash(hash_data, tx_hash)
         return jsonify(result), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-
-@production_bp.route('/productions/test', methods=['POST'])
-def get_blockchain_transaction_by_hashes():
-    """
-    API Endpoint untuk mendapatkan informasi transaksi dari hash data off-chain dan hash transaksi blockchain.
-    """
-    try:
-        # Ambil input dari body request
-        request_data = request.get_json()
-        hash_data = request_data.get('hash_data')
-        tx_hash = request_data.get('tx_hash')
-
-        # Validasi input
-        if not hash_data or not tx_hash:
-            raise ValueError("Both 'hash_data' and 'tx_hash' are required.")
-
-        # Panggil fungsi dari BlockchainQuery
-        result = blockchain_query.get_transaction_by_offchain_and_blockchain_hashes(hash_data, tx_hash)
-        return jsonify(result), 200
-
-    except ValueError as ve:
-        return jsonify({'error': str(ve)}), 400
-    except Exception as e:
-        return jsonify({'error': f"Error retrieving transaction details: {str(e)}"}), 500
-
 
 @production_bp.route('/productions', methods=['GET'])
 def get_productions():
